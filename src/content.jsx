@@ -1,18 +1,18 @@
 import react, {useState} from "react";
 
-const Content = () => {
-    const [items, setItems] = useState([
-        {title: "a", checked: false},
-        {title: "b", checked: false},
-        {title: "c", checked: false},
-    ]);
+const Content = ({items,checked, del}) => {
 
     return (
         <div>
             <ul>
-                {items.map((item, index) => {
+                {items.map((item) => {
                     return (
-                        <li key={index}>{item.title}</li>
+                        <li key = {item.index}>
+                            <input type={"checkbox"} onClick={() => checked(item.index)}/>
+                            <span
+                                style={item.checked ? {textDecoration: "line-through"} : null}>{item.title} </span>
+                            <button onClick={() => del(item.index)}> X</button>
+                        </li>
                     )
                 })}
             </ul>
