@@ -1,28 +1,37 @@
-import Content from "./content";
 import Header from "./Header";
 import AddItem from "./AddItem";
+import Content from "./content";
 import {useEffect, useState} from "react";
 
 function App() {
-    const API_URL = "http://localhost:3500/items";
+    const API_URL = "http://localhost:3500/itemss";
     const [items, setItems] = useState([]);
     const [newItem, setNewItem] = useState("initial state");
+    const [fetchError, setFetchError] = useState(null);
 
     /*
      * useEffect runs after every thing till below from above, rendered on the screen.
      * It is also async in nature.
      */
 
+    /*
+     *  commands for json server
+     *  npx json-server -p 3500 data/db.json
+     *  we wont do npm, because we dont' want json-server as our dependency.
+     */
     useEffect(() => {
         const fetchItems = async () => {
             try {
                 const response = await fetch(API_URL);
-                const json_reponse = await response.json();
-                setItems(json_reponse);
-                console.log(json_reponse);
-            } catch (err) {
-                console.log(err.stack());
+                if (!response.ok)
+                    throw Error("data couldn't be fetched");
 
+                const jsonResponse = await response.json();
+
+                setItems(jsonResponse);
+                setFetchError(null)
+            } catch (err) {
+                setFetchError(err.message);
             }
         }
         fetchItems();
@@ -65,7 +74,12 @@ function App() {
                 setNewItem={setNewItem}
                 handleSubmit={handleSubmit}
             />
-            <Content items={items} checked={checked} del={del}/>
+            {
+                fetchError ?
+                    <strong style={{color: "red"}}> Error: {fetchError} </strong>
+                    :
+                    <Content items={items} checked={checked} del={del}/>
+            }
         </>
     );
 }
