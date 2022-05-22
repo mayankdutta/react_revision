@@ -4,10 +4,11 @@ import Content from "./content";
 import {useEffect, useState} from "react";
 
 function App() {
-    const API_URL = "http://localhost:3500/itemss";
+    const API_URL = "http://localhost:3500/items";
     const [items, setItems] = useState([]);
     const [newItem, setNewItem] = useState("initial state");
     const [fetchError, setFetchError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     /*
      * useEffect runs after every thing till below from above, rendered on the screen.
@@ -32,6 +33,8 @@ function App() {
                 setFetchError(null)
             } catch (err) {
                 setFetchError(err.message);
+            } finally {
+                setLoading(false);
             }
         }
         fetchItems();
@@ -75,7 +78,10 @@ function App() {
                 handleSubmit={handleSubmit}
             />
             {
-                fetchError ?
+                loading && <strong> Loading ... </strong>
+            }
+            {
+                !loading && fetchError ?
                     <strong style={{color: "red"}}> Error: {fetchError} </strong>
                     :
                     <Content items={items} checked={checked} del={del}/>
