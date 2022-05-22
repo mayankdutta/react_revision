@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 
 function App() {
     const API_URL = "http://localhost:3500/items";
-    const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppingList')) || []);
+    const [items, setItems] = useState([]);
     const [newItem, setNewItem] = useState("initial state");
 
     /*
@@ -14,8 +14,19 @@ function App() {
      */
 
     useEffect(() => {
-        localStorage.setItem('shoppingList', JSON.stringify(items))
-    }, [items]);
+        const fetchItems = async () => {
+            try {
+                const response = await fetch(API_URL);
+                const json_reponse = await response.json();
+                setItems(json_reponse);
+                console.log(json_reponse);
+            } catch (err) {
+                console.log(err.stack());
+
+            }
+        }
+        fetchItems();
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
