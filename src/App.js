@@ -1,15 +1,21 @@
 import Content from "./content";
 import Header from "./Header";
 import AddItem from "./AddItem";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 function App() {
-    const [items, setItems] = useState([
-        {index: 1, title: "a", checked: false},
-        {index: 2, title: "b", checked: false},
-        {index: 3, title: "c", checked: false},
-    ]);
+    const API_URL = "http://localhost:3500/items";
+    const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppingList')) || []);
     const [newItem, setNewItem] = useState("initial state");
+
+    /*
+     * useEffect runs after every thing till below from above, rendered on the screen.
+     * It is also async in nature.
+     */
+
+    useEffect(() => {
+        localStorage.setItem('shoppingList', JSON.stringify(items))
+    }, [items]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -18,23 +24,20 @@ function App() {
         // first spread the original array.
         // and then add object to it, the object that array currently supports.
 
-        setItems(prev => [
-            ...prev, {
+        console.log(items);
+        let updatedItems = [...items,
+            {
                 index: items.length + 1,
                 title: newItem,
-                checked: false
-            }
-        ]);
-        localStorage.setItem('shoppingList', JSON.stringify(items));
-    };
-
-    const add = (index) => {
+                checked: false,
+            },
+        ]
+        setItems(updatedItems);
     };
 
     const del = (i) => {
         const updatedItem = items.filter((item) => item.index !== i);
         setItems(updatedItem);
-        localStorage.setItem("shoppingList", JSON.stringify(updatedItem));
     };
 
     const checked = (i) => {
@@ -42,7 +45,6 @@ function App() {
             item.index === i ? {...item, checked: !item.checked} : item
         );
         setItems(updatedItems);
-        localStorage.setItem("shoppingList", JSON.stringify(updatedItems));
     };
     return (
         <>
