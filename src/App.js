@@ -1,7 +1,9 @@
+//  npx json-server -p 3500 data/db.json, for json server
 import Header from "./Header";
 import AddItem from "./AddItem";
 import Content from "./content";
 import {useEffect, useState} from "react";
+import apiRequest from "./apiRequest";
 
 function App() {
     const API_URL = "http://localhost:3500/items";
@@ -40,7 +42,7 @@ function App() {
         fetchItems();
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // we are adding object in the array.
@@ -48,14 +50,28 @@ function App() {
         // and then add object to it, the object that array currently supports.
 
         console.log(items);
-        let updatedItems = [...items,
-            {
-                index: items.length + 1,
-                title: newItem,
-                checked: false,
-            },
-        ]
+        let updatedItem = {
+            index: items.length + 1,
+            title: newItem,
+            checked: false,
+        }
+
+
+        let updatedItems = [...items, {updatedItem}]
+
         setItems(updatedItems);
+
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedItem)
+        }
+        const result = await apiRequest(API_URL, postOptions);
+        if (result) {
+            setFetchError(result);
+        }
     };
 
     const del = (i) => {
@@ -82,7 +98,7 @@ function App() {
             }
             {
                 !loading && fetchError ?
-                    <strong style={{color: "red"}}> Error: {fetchError} </strong>
+                    <h4 style={{color: "red"}}> Error: {fetchError} </h4>
                     :
                     <Content items={items} checked={checked} del={del}/>
             }
